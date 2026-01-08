@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Is It Ready? - Tailor Management</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -17,6 +16,7 @@
             background: #0f172a;
             color: white;
             min-height: 100vh;
+            padding-bottom: 80px;
         }
 
         .header {
@@ -24,6 +24,9 @@
             border-bottom: 4px solid #3b82f6;
             padding: 1.5rem;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header-content {
@@ -45,25 +48,21 @@
             font-weight: bold;
         }
 
-        .btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
+        .stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .stat-item {
+            background: #334155;
+            padding: 0.5rem 1rem;
             border-radius: 0.5rem;
-            font-weight: bold;
-            font-size: 1.125rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            font-weight: 600;
         }
 
-        .btn:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
+        .stat-item span {
+            color: #3b82f6;
         }
 
         .container {
@@ -80,6 +79,32 @@
             display: block;
         }
 
+        /* Dashboard Filters */
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .filter-tab {
+            background: #1e293b;
+            border: 2px solid #334155;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .filter-tab.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        /* Intake Form */
         .intake-form {
             background: #1e293b;
             border-radius: 1rem;
@@ -170,19 +195,9 @@
 
         .btn-submit:hover {
             background: #2563eb;
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
         }
 
-        .btn-submit:active {
-            transform: translateY(2px);
-        }
-
-        .dashboard-title {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-        }
-
+        /* Orders */
         .orders-container {
             display: flex;
             flex-direction: column;
@@ -208,10 +223,15 @@
             padding: 1.5rem;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             border: 4px solid #cbd5e1;
+            position: relative;
         }
 
         .order-card.ready {
             border-color: #22c55e;
+        }
+
+        .order-card.paid {
+            border-color: #8b5cf6;
         }
 
         .order-header {
@@ -232,18 +252,39 @@
             align-items: center;
             gap: 0.5rem;
             color: #64748b;
-            font-size: 1.125rem;
+            font-size: 1rem;
         }
 
-        .ready-badge {
-            background: #22c55e;
-            color: white;
+        .order-badges {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+
+        .badge {
             padding: 0.5rem 1rem;
             border-radius: 9999px;
             font-weight: bold;
+            font-size: 0.875rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .badge.ready {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge.paid {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .badge.pending {
+            background: #f59e0b;
+            color: white;
         }
 
         .measurements-box {
@@ -277,37 +318,91 @@
             margin-top: 0.25rem;
         }
 
+        .order-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .btn-action {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
         .btn-ready {
-            width: 100%;
             background: #22c55e;
             color: white;
-            border: none;
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            font-weight: bold;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            grid-column: 1 / -1;
         }
 
         .btn-ready:hover {
             background: #16a34a;
-            box-shadow: 0 15px 40px rgba(34, 197, 94, 0.4);
         }
 
-        .btn-ready:active {
-            transform: translateY(2px);
+        .btn-paid {
+            background: #8b5cf6;
+            color: white;
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.8;
-            }
+        .btn-paid:hover {
+            background: #7c3aed;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1e293b;
+            border-top: 2px solid #334155;
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            color: #94a3b8;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+            background: #334155;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
         }
 
         @media (max-width: 640px) {
@@ -317,6 +412,14 @@
 
             .measurements-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .order-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                display: none;
             }
         }
     </style>
@@ -332,16 +435,30 @@
                 </svg>
                 <h1>Is It Ready?</h1>
             </div>
-            <button class="btn" id="toggleBtn">+ New Order</button>
+            <div class="stats">
+                <div class="stat-item">Live: <span id="liveCount">0</span></div>
+                <div class="stat-item">Completed: <span id="completedCount">0</span></div>
+            </div>
         </div>
     </div>
 
     <!-- Main Container -->
     <div class="container">
-        <!-- Intake Screen -->
-        <div class="screen" id="intakeScreen">
+        <!-- Dashboard Screen -->
+        <div class="screen active" id="dashboardScreen">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All Orders</button>
+                <button class="filter-tab" data-filter="in-progress">In Progress</button>
+                <button class="filter-tab" data-filter="ready">Ready</button>
+                <button class="filter-tab" data-filter="paid">Paid</button>
+            </div>
+            <div class="orders-container" id="ordersContainer"></div>
+        </div>
+
+        <!-- New Order Screen -->
+        <div class="screen" id="newOrderScreen">
             <div class="intake-form">
-                <h2 class="form-title">New Customer</h2>
+                <h2 class="form-title">New Customer Order</h2>
                 
                 <div class="form-group">
                     <label>Customer Name *</label>
@@ -384,66 +501,93 @@
             </div>
         </div>
 
-        <!-- Dashboard Screen -->
-        <div class="screen active" id="dashboardScreen">
-            <h2 class="dashboard-title">Live Orders</h2>
-            <div class="orders-container" id="ordersContainer"></div>
+        <!-- Previous Orders Screen -->
+        <div class="screen" id="previousOrdersScreen">
+            <h2 style="font-size: 2rem; font-weight: bold; margin-bottom: 1.5rem;">Previous Orders</h2>
+            <div class="orders-container" id="previousOrdersContainer"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-screen="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-screen="newOrder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <span>New Order</span>
+        </div>
+        <div class="nav-item" data-screen="previousOrders">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>Previous</span>
         </div>
     </div>
 
     <script>
-        // State
         let currentScreen = 'dashboard';
+        let currentFilter = 'all';
         let orders = [
             {
                 id: 1,
                 name: 'Rajesh Kumar',
                 phone: '919876543210',
                 measurements: { length: '40', chest: '38', waist: '32', shoulder: '16', sleeves: '24' },
-                status: 'in-progress'
+                status: 'ready',
+                paid: false,
+                date: new Date().toISOString()
             },
             {
                 id: 2,
                 name: 'Priya Singh',
                 phone: '919876543211',
                 measurements: { length: '38', chest: '34', waist: '28', shoulder: '14', sleeves: '22' },
-                status: 'in-progress'
+                status: 'in-progress',
+                paid: false,
+                date: new Date().toISOString()
             }
         ];
 
-        // Elements
-        const toggleBtn = document.getElementById('toggleBtn');
-        const intakeScreen = document.getElementById('intakeScreen');
-        const dashboardScreen = document.getElementById('dashboardScreen');
-        const addOrderBtn = document.getElementById('addOrderBtn');
-        const ordersContainer = document.getElementById('ordersContainer');
-
-        // Toggle screens
-        function toggleScreen() {
-            console.log('Toggle clicked! Current screen:', currentScreen);
-            
-            if (currentScreen === 'dashboard') {
-                // Switch to intake
-                currentScreen = 'intake';
-                dashboardScreen.classList.remove('active');
-                intakeScreen.classList.add('active');
-                toggleBtn.textContent = '← Dashboard';
-                console.log('Switched to intake screen');
-            } else {
-                // Switch to dashboard
-                currentScreen = 'dashboard';
-                intakeScreen.classList.remove('active');
-                dashboardScreen.classList.add('active');
-                toggleBtn.textContent = '+ New Order';
-                renderOrders();
-                console.log('Switched to dashboard screen');
-            }
+        function updateStats() {
+            const liveCount = orders.filter(o => o.status !== 'completed').length;
+            const completedCount = orders.filter(o => o.status === 'completed').length;
+            document.getElementById('liveCount').textContent = liveCount;
+            document.getElementById('completedCount').textContent = completedCount;
         }
 
-        // Add order
-        function addOrder() {
-            console.log('Add Order clicked!');
+        function switchScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             
+            document.getElementById(screenName + 'Screen').classList.add('active');
+            document.querySelector(`[data-screen="${screenName}"]`).classList.add('active');
+            
+            currentScreen = screenName;
+            
+            if (screenName === 'dashboard') renderOrders();
+            if (screenName === 'previousOrders') renderPreviousOrders();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderOrders();
+        }
+
+        function addOrder() {
             const name = document.getElementById('customerName').value.trim();
             const phone = document.getElementById('customerPhone').value.trim();
             const length = document.getElementById('length').value.trim();
@@ -452,8 +596,6 @@
             const shoulder = document.getElementById('shoulder').value.trim();
             const sleeves = document.getElementById('sleeves').value.trim();
 
-            console.log('Form data:', { name, phone, length, chest, waist, shoulder, sleeves });
-
             if (!name || !phone) {
                 alert('Name and Phone are required');
                 return;
@@ -461,17 +603,16 @@
 
             const newOrder = {
                 id: Date.now(),
-                name: name,
-                phone: phone,
+                name,
+                phone,
                 measurements: { length, chest, waist, shoulder, sleeves },
-                status: 'in-progress'
+                status: 'in-progress',
+                paid: false,
+                date: new Date().toISOString()
             };
 
             orders.unshift(newOrder);
-            console.log('New order added:', newOrder);
-            console.log('Total orders:', orders.length);
 
-            // Clear form
             document.getElementById('customerName').value = '';
             document.getElementById('customerPhone').value = '';
             document.getElementById('length').value = '';
@@ -480,44 +621,59 @@
             document.getElementById('shoulder').value = '';
             document.getElementById('sleeves').value = '';
 
-            toggleScreen();
+            switchScreen('dashboard');
         }
 
-        // Mark order ready and send WhatsApp
         function markReady(orderId) {
-            console.log('Mark ready clicked for order:', orderId);
-            
             const order = orders.find(o => o.id === orderId);
-            if (!order) {
-                console.log('Order not found');
-                return;
-            }
+            if (!order) return;
 
             order.status = 'ready';
-            console.log('Order marked as ready:', order);
             
             const message = encodeURIComponent(`Hello ${order.name}, your order is ready for pickup! 🎉`);
             const whatsappUrl = `https://wa.me/${order.phone}?text=${message}`;
             
-            console.log('Opening WhatsApp URL:', whatsappUrl);
             window.open(whatsappUrl, '_blank');
             renderOrders();
+            updateStats();
         }
 
-        // Render orders
+        function markPaid(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            order.paid = true;
+            order.status = 'completed';
+            renderOrders();
+            updateStats();
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm('Are you sure you want to delete this order?')) {
+                orders = orders.filter(o => o.id !== orderId);
+                renderOrders();
+                updateStats();
+            }
+        }
+
+        function getFilteredOrders() {
+            if (currentFilter === 'all') return orders.filter(o => o.status !== 'completed');
+            if (currentFilter === 'in-progress') return orders.filter(o => o.status === 'in-progress');
+            if (currentFilter === 'ready') return orders.filter(o => o.status === 'ready');
+            if (currentFilter === 'paid') return orders.filter(o => o.paid);
+            return orders;
+        }
+
         function renderOrders() {
-            console.log('Rendering orders. Total:', orders.length);
-            
-            if (orders.length === 0) {
-                ordersContainer.innerHTML = `
-                    <div class="empty-state">
-                        <p>No orders yet. Add your first customer!</p>
-                    </div>
-                `;
+            const container = document.getElementById('ordersContainer');
+            const filteredOrders = getFilteredOrders();
+
+            if (filteredOrders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No orders found</p></div>';
                 return;
             }
 
-            ordersContainer.innerHTML = orders.map(order => {
+            container.innerHTML = filteredOrders.map(order => {
                 const measurements = Object.entries(order.measurements)
                     .filter(([_, value]) => value)
                     .map(([key, value]) => `
@@ -528,68 +684,100 @@
                     `).join('');
 
                 return `
-                    <div class="order-card ${order.status === 'ready' ? 'ready' : ''}">
+                    <div class="order-card ${order.status} ${order.paid ? 'paid' : ''}">
                         <div class="order-header">
                             <div class="order-info">
                                 <h3>${order.name}</h3>
-                                <div class="order-phone">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                                    </svg>
-                                    <span>${order.phone}</span>
-                                </div>
+                                <div class="order-phone">📞 ${order.phone}</div>
                             </div>
-                            ${order.status === 'ready' ? `
-                                <span class="ready-badge">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                                    </svg>
-                                    Ready
-                                </span>
-                            ` : ''}
+                            <div class="order-badges">
+                                ${order.status === 'ready' ? '<span class="badge ready">✓ Ready</span>' : ''}
+                                ${order.paid ? '<span class="badge paid">💰 Paid</span>' : ''}
+                                ${order.status === 'in-progress' ? '<span class="badge pending">⏳ In Progress</span>' : ''}
+                            </div>
                         </div>
 
                         ${measurements ? `
                             <div class="measurements-box">
-                                <div class="measurements-grid">
-                                    ${measurements}
-                                </div>
+                                <div class="measurements-grid">${measurements}</div>
                             </div>
                         ` : ''}
 
-                        ${order.status === 'in-progress' ? `
-                            <button class="btn-ready" onclick="markReady(${order.id})">
-                                ✅ Mark Ready & Notify
+                        <div class="order-actions">
+                            ${order.status === 'in-progress' ? `
+                                <button class="btn-action btn-ready" onclick="markReady(${order.id})">
+                                    ✅ Mark Ready
+                                </button>
+                            ` : ''}
+                            ${order.status === 'ready' && !order.paid ? `
+                                <button class="btn-action btn-paid" onclick="markPaid(${order.id})">
+                                    💰 Mark Paid
+                                </button>
+                            ` : ''}
+                            <button class="btn-action btn-delete" onclick="deleteOrder(${order.id})">
+                                🗑️ Delete
                             </button>
-                        ` : ''}
+                        </div>
                     </div>
                 `;
             }).join('');
-            
-            console.log('Orders rendered successfully');
         }
 
-        // Event listeners - Make sure these are attached properly
-        console.log('Setting up event listeners...');
-        
-        toggleBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Toggle button clicked via event listener');
-            toggleScreen();
+        function renderPreviousOrders() {
+            const container = document.getElementById('previousOrdersContainer');
+            const completedOrders = orders.filter(o => o.status === 'completed');
+
+            if (completedOrders.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No previous orders</p></div>';
+                return;
+            }
+
+            container.innerHTML = completedOrders.map(order => {
+                const measurements = Object.entries(order.measurements)
+                    .filter(([_, value]) => value)
+                    .map(([key, value]) => `
+                        <div class="measurement-item">
+                            <div class="measurement-label">${key}</div>
+                            <div class="measurement-value">${value}"</div>
+                        </div>
+                    `).join('');
+
+                return `
+                    <div class="order-card paid">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3>${order.name}</h3>
+                                <div class="order-phone">📞 ${order.phone}</div>
+                            </div>
+                            <span class="badge paid">💰 Paid</span>
+                        </div>
+                        ${measurements ? `
+                            <div class="measurements-box">
+                                <div class="measurements-grid">${measurements}</div>
+                            </div>
+                        ` : ''}
+                        <div class="order-actions">
+                            <button class="btn-action btn-delete" onclick="deleteOrder(${order.id})">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => switchScreen(item.dataset.screen));
         });
 
-        addOrderBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Add Order button clicked via event listener');
-            addOrder();
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => setFilter(tab.dataset.filter));
         });
 
-        // Initial render
-        console.log('Initial setup - starting on dashboard');
+        document.getElementById('addOrderBtn').addEventListener('click', addOrder);
+
         renderOrders();
-        
-        console.log('App initialized successfully!');
+        updateStats();
     </script>
 </body>
 </html>
