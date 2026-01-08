@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Is It Ready? - Tailor Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f172a;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #1e293b;
+            border-bottom: 4px solid #3b82f6;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .intake-form {
+            background: #1e293b;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            background: #334155;
+            border: 2px solid #475569;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 1.25rem;
+            color: white;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #3b82f6;
+        }
+
+        .note {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .measurement-card {
+            background: #334155;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .measurement-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin-bottom: 1rem;
+        }
+
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .measurement-input input {
+            background: #1e293b;
+        }
+
+        .measurement-input input:focus {
+            border-color: #fbbf24;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-submit:hover {
+            background: #2563eb;
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(2px);
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .orders-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .empty-state {
+            background: #1e293b;
+            border-radius: 0.75rem;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .empty-state p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+        }
+
+        .order-card {
+            background: white;
+            color: #0f172a;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 4px solid #cbd5e1;
+        }
+
+        .order-card.ready {
+            border-color: #22c55e;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .order-info h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-phone {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+            font-size: 1.125rem;
+        }
+
+        .ready-badge {
+            background: #22c55e;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .measurements-box {
+            background: #f1f5f9;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .measurements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            text-align: center;
+        }
+
+        .measurement-item {
+            padding: 0.5rem;
+        }
+
+        .measurement-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .measurement-value {
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin-top: 0.25rem;
+        }
+
+        .btn-ready {
+            width: 100%;
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .btn-ready:hover {
+            background: #16a34a;
+            box-shadow: 0 15px 40px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-ready:active {
+            transform: translateY(2px);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .measurement-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .measurements-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6m-8-8h6m6 0h6"></path>
+                </svg>
+                <h1>Is It Ready?</h1>
+            </div>
+            <button class="btn" id="toggleBtn">+ New Order</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Intake Screen -->
+        <div class="screen" id="intakeScreen">
+            <div class="intake-form">
+                <h2 class="form-title">New Customer</h2>
+                
+                <div class="form-group">
+                    <label>Customer Name *</label>
+                    <input type="text" id="customerName" placeholder="Enter name">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="customerPhone" placeholder="919876543210">
+                    <p class="note">Include country code (e.g., 91 for India)</p>
+                </div>
+
+                <div class="measurement-card">
+                    <h3>📏 Measurement Card</h3>
+                    <div class="measurement-grid">
+                        <div class="form-group measurement-input">
+                            <label>Length</label>
+                            <input type="text" id="length" placeholder="inches">
+                        </div>
+                        <div class="form-group measurement-input">
+                            <label>Chest</label>
+                            <input type="text" id="chest" placeholder="inches">
+                        </div>
+                        <div class="form-group measurement-input">
+                            <label>Waist</label>
+                            <input type="text" id="waist" placeholder="inches">
+                        </div>
+                        <div class="form-group measurement-input">
+                            <label>Shoulder</label>
+                            <input type="text" id="shoulder" placeholder="inches">
+                        </div>
+                        <div class="form-group measurement-input">
+                            <label>Sleeves</label>
+                            <input type="text" id="sleeves" placeholder="inches">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-submit" id="addOrderBtn">Add Order</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div class="screen active" id="dashboardScreen">
+            <h2 class="dashboard-title">Live Orders</h2>
+            <div class="orders-container" id="ordersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentScreen = 'dashboard';
+        let orders = [
+            {
+                id: 1,
+                name: 'Rajesh Kumar',
+                phone: '919876543210',
+                measurements: { length: '40', chest: '38', waist: '32', shoulder: '16', sleeves: '24' },
+                status: 'in-progress'
+            },
+            {
+                id: 2,
+                name: 'Priya Singh',
+                phone: '919876543211',
+                measurements: { length: '38', chest: '34', waist: '28', shoulder: '14', sleeves: '22' },
+                status: 'in-progress'
+            }
+        ];
+
+        // Elements
+        const toggleBtn = document.getElementById('toggleBtn');
+        const intakeScreen = document.getElementById('intakeScreen');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        const addOrderBtn = document.getElementById('addOrderBtn');
+        const ordersContainer = document.getElementById('ordersContainer');
+
+        // Toggle screens
+        function toggleScreen() {
+            console.log('Toggle clicked! Current screen:', currentScreen);
+            
+            if (currentScreen === 'dashboard') {
+                // Switch to intake
+                currentScreen = 'intake';
+                dashboardScreen.classList.remove('active');
+                intakeScreen.classList.add('active');
+                toggleBtn.textContent = '← Dashboard';
+                console.log('Switched to intake screen');
+            } else {
+                // Switch to dashboard
+                currentScreen = 'dashboard';
+                intakeScreen.classList.remove('active');
+                dashboardScreen.classList.add('active');
+                toggleBtn.textContent = '+ New Order';
+                renderOrders();
+                console.log('Switched to dashboard screen');
+            }
+        }
+
+        // Add order
+        function addOrder() {
+            console.log('Add Order clicked!');
+            
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const length = document.getElementById('length').value.trim();
+            const chest = document.getElementById('chest').value.trim();
+            const waist = document.getElementById('waist').value.trim();
+            const shoulder = document.getElementById('shoulder').value.trim();
+            const sleeves = document.getElementById('sleeves').value.trim();
+
+            console.log('Form data:', { name, phone, length, chest, waist, shoulder, sleeves });
+
+            if (!name || !phone) {
+                alert('Name and Phone are required');
+                return;
+            }
+
+            const newOrder = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                measurements: { length, chest, waist, shoulder, sleeves },
+                status: 'in-progress'
+            };
+
+            orders.unshift(newOrder);
+            console.log('New order added:', newOrder);
+            console.log('Total orders:', orders.length);
+
+            // Clear form
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('length').value = '';
+            document.getElementById('chest').value = '';
+            document.getElementById('waist').value = '';
+            document.getElementById('shoulder').value = '';
+            document.getElementById('sleeves').value = '';
+
+            toggleScreen();
+        }
+
+        // Mark order ready and send WhatsApp
+        function markReady(orderId) {
+            console.log('Mark ready clicked for order:', orderId);
+            
+            const order = orders.find(o => o.id === orderId);
+            if (!order) {
+                console.log('Order not found');
+                return;
+            }
+
+            order.status = 'ready';
+            console.log('Order marked as ready:', order);
+            
+            const message = encodeURIComponent(`Hello ${order.name}, your order is ready for pickup! 🎉`);
+            const whatsappUrl = `https://wa.me/${order.phone}?text=${message}`;
+            
+            console.log('Opening WhatsApp URL:', whatsappUrl);
+            window.open(whatsappUrl, '_blank');
+            renderOrders();
+        }
+
+        // Render orders
+        function renderOrders() {
+            console.log('Rendering orders. Total:', orders.length);
+            
+            if (orders.length === 0) {
+                ordersContainer.innerHTML = `
+                    <div class="empty-state">
+                        <p>No orders yet. Add your first customer!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            ordersContainer.innerHTML = orders.map(order => {
+                const measurements = Object.entries(order.measurements)
+                    .filter(([_, value]) => value)
+                    .map(([key, value]) => `
+                        <div class="measurement-item">
+                            <div class="measurement-label">${key}</div>
+                            <div class="measurement-value">${value}"</div>
+                        </div>
+                    `).join('');
+
+                return `
+                    <div class="order-card ${order.status === 'ready' ? 'ready' : ''}">
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3>${order.name}</h3>
+                                <div class="order-phone">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                    <span>${order.phone}</span>
+                                </div>
+                            </div>
+                            ${order.status === 'ready' ? `
+                                <span class="ready-badge">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                    Ready
+                                </span>
+                            ` : ''}
+                        </div>
+
+                        ${measurements ? `
+                            <div class="measurements-box">
+                                <div class="measurements-grid">
+                                    ${measurements}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${order.status === 'in-progress' ? `
+                            <button class="btn-ready" onclick="markReady(${order.id})">
+                                ✅ Mark Ready & Notify
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            console.log('Orders rendered successfully');
+        }
+
+        // Event listeners - Make sure these are attached properly
+        console.log('Setting up event listeners...');
+        
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Toggle button clicked via event listener');
+            toggleScreen();
+        });
+
+        addOrderBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Add Order button clicked via event listener');
+            addOrder();
+        });
+
+        // Initial render
+        console.log('Initial setup - starting on dashboard');
+        renderOrders();
+        
+        console.log('App initialized successfully!');
+    </script>
+</body>
+</html>
